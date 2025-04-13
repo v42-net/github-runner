@@ -1,5 +1,5 @@
 # github-runner
-Self-managing version of the official GitHub Action Runner container.
+A self-managing version of the official GitHub Action Runner container image.
 
 - https://github.com/v42-net/github-runner/pkgs/container/github-runner
 
