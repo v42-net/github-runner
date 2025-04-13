@@ -1,6 +1,6 @@
 # github-runner
 Self-managing version of the official GitHub Action Runner container
--https://github.com/v42-net/github-runner/pkgs/container/github-runner
+- https://github.com/v42-net/github-runner/pkgs/container/github-runner
 
 #### DONE:
 1. Import the configuration from the environment variables
