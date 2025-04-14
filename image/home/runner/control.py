@@ -22,13 +22,37 @@ class Config():
       setattr(self, key, "")
       try:
         value = re.sub(r"\s+", "", os.environ[ConfigMap[key]])
-        setattr(self, key, value)
       except:
+        value = ""
+      if value != "":
+        setattr(self, key, value)
+        continue
+      try:
+        file = os.environ[ConfigMap[key]+"_FILE"]
+      except:
+        file = ""
+      if file == "":
         if key != 'group' and key != 'labels':
           print("Failed to read '"+key+"' from environment variable", ConfigMap[key])
           errors += 1
+        continue
+      try:
+        with open(file) as f:
+          value = re.sub(r"\s+", "", f.read())
+      except:
+        value = ""
+      if value != "":
+        setattr(self, key, value)
+        continue
+      print("Failed to read '"+key+"' from ", file)
+      errors += 1
     if errors > 0:
       exit(1)
+    for key in ConfigMap:
+      value = getattr(self, key)
+      if key == 'token':
+        value = "********"
+      print("[CONTROL] Config:"+key,"=", value)
 class Control():
   def __init__(self):
     print("[CONTROL] Import the configuration")
