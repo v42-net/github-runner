@@ -1,3 +1,6 @@
+/docker/run.env
+/secret.txt
+
 /config.env
 /config.txt
 

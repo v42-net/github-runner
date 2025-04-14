@@ -1,0 +1,3 @@
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+IMAGE=ghcr.io/v42-net/github-runner
+

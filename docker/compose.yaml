@@ -1,0 +1,15 @@
+services:
+  github-runner.v42-net:
+    image: ghcr.io/v42-net/github-runner
+    environment:
+      GITHUB_RUNNER_NAME: ${FULLHOSTNAME:?error}
+      GITHUB_ORGANIZATION: v42-net
+      GITHUB_ACCESS_TOKEN_FILE: /run/secrets/GITHUB_ACCESS_TOKEN
+    secrets:
+      - GITHUB_ACCESS_TOKEN
+    restart: always
+    tty: true
+secrets:
+  GITHUB_ACCESS_TOKEN:
+    file: /home/peter/V42-NET/github-runner/secret.txt
+
