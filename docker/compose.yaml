@@ -11,5 +11,5 @@ services:
     tty: true
 secrets:
   GITHUB_ACCESS_TOKEN:
-    file: /home/peter/V42-NET/github-runner/secret.txt
+    file: ../secret.txt
 
