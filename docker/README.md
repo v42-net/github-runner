@@ -2,7 +2,7 @@
 Docker offers three ways to run a container image:
 - Simply with `docker run`, but without any support for secrets
 - Using `docker compose`, with somewhat better support for secrets
-- Using `docker service`, to be investigated ...
+- Using `docker service`, requiring a docker swarm, but most secure 
 
 > *All of the example scripts referenced below expect the GitHub Access Token to be stored in `../secret.txt` (which is obviously not stored in GitHub). Create this file with your own GitHub Access Token (PAT) and update the scripts with the parameters for your environment before using them.*
 
