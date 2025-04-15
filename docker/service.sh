@@ -4,7 +4,7 @@ cd $(dirname $0)
 GITHUB_ORGANIZATION=v42-net
 
 # (re)create the docker secret from ../secret.txt
-SECRET=github-runner.$GITHUB_ORGANIZATION
+SECRET=github-runner-$GITHUB_ORGANIZATION
 set +e
 docker secret rm $SECRET >/dev/null 2>&1
 set -e
