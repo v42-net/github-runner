@@ -114,9 +114,9 @@ class GitHub():
       'X-GitHub-Api-Version': GitHubApiVersion
     })
   def error (self, method, path, response):
-    print("[CONTROL]",method, self.api+path, "returned", r.status_code, r.reason)
+    print("[CONTROL]",method, self.api+path, "returned", response.status_code, response.reason)
     try:
-      pprint(r.json())
+      pprint(response.json())
     except:
       pass
     exit(1)
