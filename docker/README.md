@@ -25,4 +25,4 @@ support encrypted secrets).
 to the container. The GitHub Access Token is passed as an encrypted secret to
 the container. This is the most secure docker solution.
 
-> *See [`service.sh`](run.sh) for a full example on how to use `docker service`*
+> *See [`service.sh`](service.sh) for a full example on how to use `docker service`*
