@@ -1,4 +1,4 @@
-/docker/run.env
+/docker/*.env
 /secret.txt
 
 /config.env
