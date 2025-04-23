@@ -133,12 +133,14 @@ class Control():
     process = subprocess.Popen(cmd)
     return process
   def stopRunner(self, process):
+    Log("Stop our local runner process")
     process.terminate()
     if self.stoptimer == 0:
       self.stoptimer = time.time()
       return
     timer = time.time() - self.stoptimer
     if timer > 10:
+      Log("Kill our local runner process")
       process.kill()
 
 class GitHub():
