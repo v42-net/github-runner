@@ -51,7 +51,7 @@ GitHub Access Token to be visible as an environment variable.
 ## Usage
 - For use with Docker see the [`docker`](docker) folder.
 - For use with Podman see the [`podman`](podman) folder (*to be documented*).
-- For Microsoft Azure see the [`azure`](azure) folder (*to be documented*).
+- For Microsoft Azure see the [`azure`](azure) folder (*partly documented*).
 - For Google Cloud Platform see the [`gcp`](gcp) folder (*to be documented*).
 
 I currently have no access to an AWS environment for testing purposes, 
