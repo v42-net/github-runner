@@ -3,6 +3,7 @@ import os
 from pprint import pprint
 import re
 import requests
+import signal
 import subprocess
 import time
 
@@ -15,8 +16,21 @@ ConfigMap = {
 }
 GitHubApiVersion = "2022-11-28"
 
+def Log(message):
+  print("[CONTROL "+time.strftime('%Y-%m-%d %XZ')+"]", message)
+
+if os.path.exists("/home/runner/.stop"):
+  os.remove("/home/runner/.stop")
+def StopHandler(sig, frame):
+  with open("/home/runner/.stop", "w") as file:
+    file.write(str(sig))
+signal.signal(signal.SIGINT, StopHandler)
+signal.signal(signal.SIGTERM, StopHandler)
+
 class Config():
   def __init__(self):
+    os.environ['TZ'] = 'UTC'
+    time.tzset()
     errors = 0
     for key in ConfigMap:
       setattr(self, key, "")
@@ -52,24 +66,37 @@ class Config():
       value = getattr(self, key)
       if key == 'token':
         value = "********"
-      print("[CONTROL] Config:"+key,"=", value)
+      Log("Config:"+key+" = "+str(value))
 class Control():
   def __init__(self):
-    print("[CONTROL] Import the configuration")
+    Log("Import the configuration")
     self.config = Config()
-    print("[CONTROL] Remove our local runner configuration")
+    if os.path.exists("/home/runner/.stop"): exit(1)
+
+    Log("Remove our local runner configuration")
     self.removeRunner()
-    print("[CONTROL] Connect to GitHub/"+self.config.org)
+    if os.path.exists("/home/runner/.stop"): exit(1)
+
+    Log("Connect to GitHub/"+self.config.org)
     self.github = GitHub(self.config)
-    print("[CONTROL] Remove our old runner registration")
+    if os.path.exists("/home/runner/.stop"): exit(1)
+
+    Log("Remove our old runner registration")
     self.github.deleteRunner()
-    print("[CONTROL] Get a new runner registration token")
+    if os.path.exists("/home/runner/.stop"): exit(1)
+
+    Log("Get a new runner registration token")
     token = self.github.runnerToken()
-    print("[CONTROL] Configure our local runner process")
+    if os.path.exists("/home/runner/.stop"): exit(1)
+
+    Log("Configure our local runner process")
     self.configureRunner(token)
-    print("[CONTROL] Start our local runner process")
+    if os.path.exists("/home/runner/.stop"): exit(1)
+
+    Log("Start our local runner process")
     process = self.startRunner()
-    print("[CONTROL] Start monitoring our GitHub runner")
+    Log("Start monitoring our GitHub runner")
+    self.stoptimer = 0
     while process.poll() == None:
       self.monitorRunner(process)
     exit(process.returncode)
@@ -85,23 +112,35 @@ class Control():
       exit(1)
   def monitorRunner(self, process):
     for t in range(42):
+      if os.path.exists("/home/runner/.stop"):
+        self.stopRunner(process)
       time.sleep(1)
       if process.poll() != None:
-        exit(process.returncode)
+        return
     status = self.github.runnerStatus()
-    print("[CONTROL] GitHub runner status:", status)
+    Log("GitHub runner status: "+status)
     if status != "online":
-      process.terminate()
+      self.stopRunner(process)
   def removeRunner(self):
+    if os.path.exists("/home/runner/.credentials"):
+      os.remove("/home/runner/.credentials")
     cmd = ["/home/runner/config.sh","remove"]
-    rc = subprocess.run(cmd, capture_output=True, text=True)
+    rc = subprocess.run(cmd, capture_output=False, text=True)
     if rc.returncode > 0:
-      print(rc.stdout+"\n"+rc.stderr)
       exit(1)
   def startRunner(self):
     cmd = ["/home/runner/run.sh"]
     process = subprocess.Popen(cmd)
     return process
+  def stopRunner(self, process):
+    process.terminate()
+    if self.stoptimer == 0:
+      self.stoptimer = time.time()
+      return
+    timer = time.time() - self.stoptimer
+    if timer > 10:
+      process.kill()
+
 class GitHub():
   def __init__(self, config):
     self.api = "https://api.github.com"
@@ -114,14 +153,14 @@ class GitHub():
       'X-GitHub-Api-Version': GitHubApiVersion
     })
   def error (self, method, path, response):
-    print("[CONTROL]",method, self.api+path, "returned", response.status_code, response.reason)
+    Log(method+" "+self.api+path+" returned "+str(response.status_code)+" "+response.reason)
     try:
       pprint(response.json())
     except:
       pass
     exit(1)
   def failed(self, method, path, e):
-    print("[CONTROL]",method, self.api+path, "failed")
+    Log(method+" "+self.api+path+" failed")
     print(e)
     exit(1)
   def deleteRunner(self):
