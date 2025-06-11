@@ -101,7 +101,12 @@ class Control():
       self.monitorRunner(process)
     exit(process.returncode)
   def configureRunner(self, token):
-    cmd = ["/home/runner/config.sh","--unattended", "--url","https://github.com/"+self.config.org,"--token",token,"--name",self.config.name]
+    cmd = [ "/home/runner/config.sh",
+            "--unattended", 
+            "--url","https://github.com/"+self.config.org,
+            "--token",token,
+            "--name",self.config.name,
+            "--replace" ]
     if self.config.group != "":
       cmd.extend(["--runnergroup",self.config.group])
     if self.config.labels != "":
